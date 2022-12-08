@@ -44,11 +44,14 @@ SELECT a.name, AVG(t.duration) FROM album a
 JOIN track t ON a.albumid = t.album_id
 GROUP BY a.name;
 
--- Найдем всех исполнителей, которые не выпустили альбомы в 2020 году;
-SELECT ar.name, al.year_release  FROM artist ar 
+-- Найдем всех исполнителей, которые не выпустили альбомы в 2019 году;
+SELECT name FROM artist
+WHERE name NOT IN (
+SELECT ar.name  FROM artist ar 
 JOIN albumartist aa ON aa.artist_id = ar.artistid
 JOIN album al ON al.albumid = aa.album_id
-WHERE al.year_release NOT BETWEEN '01.01.2020' AND '31.12.2020';
+WHERE al.year_release BETWEEN '01.01.2019' AND '31.12.2019'
+);
 
 -- Найдем названия сборников, в которых присутствует конкретный исполнитель (Пуся);
 SELECT c.name, ar.name FROM collection c 
@@ -86,5 +89,10 @@ WHERE t.duration = (SELECT min(duration) FROM track)
 SELECT a.name, Count(t.name) FROM album a 
 JOIN track t ON a.albumid = t.album_id
 GROUP BY a.name
+HAVING Count(t.name) = (
+SELECT Count(t.name) FROM album a 
+JOIN track t ON a.albumid = t.album_id
+GROUP BY a.name
 ORDER BY Count(t.name) DESC
-LIMIT 1;
+LIMIT 1
+);
